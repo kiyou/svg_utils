@@ -336,13 +336,13 @@ class SVGFigure(object):
         self.root.set("height", h)
 
 
-def fromfile(fname):
+def fromfile(file):
     """Open SVG figure from file.
 
     Parameters
     ----------
-    fname : str
-        name of the SVG file
+    file : str or io.StringIO
+        name of the SVG file or file object
 
     Returns
     -------
@@ -350,8 +350,11 @@ def fromfile(fname):
         newly created :py:class:`SVGFigure` initialised with the file content
     """
     fig = SVGFigure()
-    with open(fname) as fid:
-        svg_file = etree.parse(fid, parser=etree.XMLParser(huge_tree=True))
+    if isinstance(file, StringIO):
+        svg_file = etree.parse(file, parser=etree.XMLParser(huge_tree=True))
+    elif isinstance(file, str):
+        with open(file) as fid:
+            svg_file = etree.parse(fid, parser=etree.XMLParser(huge_tree=True))
 
     fig.root = svg_file.getroot()
     return fig
