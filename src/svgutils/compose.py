@@ -103,16 +103,21 @@ class SVG(Element):
 
     Parameters
     ----------
-    fname : str
-       full path to the file
+    svg_src : str, fig
+       full path to the file, SVG string, or matplotlib.pyplot.Figure object
     fix_mpl : bool
         replace pt units with px units to fix files created with matplotlib
     """
 
-    def __init__(self, fname=None, fix_mpl=False):
-        if fname:
-            fname = os.path.join(CONFIG["svg.file_path"], fname)
-            svg = _transform.fromfile(fname)
+    def __init__(self, svg_src=None, fix_mpl=False):
+        if svg_src:
+            if isinstance(svg_src, str):
+                if os.path.isfile(os.path.join(CONFIG["svg.file_path"], svg_src)):
+                    svg = _transform.fromfile(os.path.join(CONFIG["svg.file_path"], svg_src))
+                else:
+                    svg = _transform.fromstring(svg_src)
+            else:
+                svg = _transform.from_mpl(svg_src)
             if fix_mpl:
                 w, h = svg.get_size()
                 svg.set_size((w.replace("pt", ""), h.replace("pt", "")))
